@@ -94,26 +94,82 @@
 
     [data-warp] {
       opacity: 0;
-      transform: translateY(24px);
-      transition: opacity var(--duration-slow) var(--ease-warp),
-                  transform var(--duration-slow) var(--ease-warp);
+      clip-path: inset(0 0 60% 0);
+      transform: translateY(28px);
+      transition:
+        opacity var(--duration-slow) var(--ease-warp),
+        clip-path var(--duration-slow) var(--ease-warp),
+        transform var(--duration-slow) var(--ease-warp);
     }
-    [data-warp].is-visible { opacity: 1; transform: translateY(0); }
+    [data-warp].is-visible {
+      opacity: 1;
+      clip-path: inset(0 0 0% 0);
+      transform: translateY(0);
+    }
     [data-warp="left"] {
       opacity: 0;
-      transform: translateX(-24px);
-      transition: opacity var(--duration-slow) var(--ease-warp),
-                  transform var(--duration-slow) var(--ease-warp);
+      clip-path: inset(0 100% 0 0);
+      transform: translateX(-28px);
+      transition:
+        opacity var(--duration-slow) var(--ease-warp),
+        clip-path var(--duration-slow) var(--ease-warp),
+        transform var(--duration-slow) var(--ease-warp);
     }
-    [data-warp="left"].is-visible { opacity: 1; transform: translateX(0); }
+    [data-warp="left"].is-visible {
+      opacity: 1;
+      clip-path: inset(0 0% 0 0);
+      transform: translateX(0);
+    }
 
     [data-fade] {
       opacity: 0;
-      transform: translateY(24px);
-      transition: opacity var(--duration-slow) var(--ease-warp),
-                  transform var(--duration-slow) var(--ease-warp);
+      transform: translateY(20px);
+      transition:
+        opacity var(--duration-slow) var(--ease-warp),
+        transform var(--duration-slow) var(--ease-warp);
     }
     [data-fade].is-visible { opacity: 1; transform: translateY(0); }
+
+    /* ── CLIP-PATH REVEAL [data-clip] ── */
+    [data-clip] {
+      overflow: hidden;
+      display: block;
+    }
+    [data-clip] .clip-inner {
+      display: block;
+      clip-path: inset(0 0 100% 0);
+      transform: translateY(12px);
+      transition:
+        clip-path 1.0s var(--ease-warp),
+        transform 1.0s var(--ease-warp);
+    }
+    [data-clip][data-delay="1"] .clip-inner { transition-delay: 0.12s; }
+    [data-clip][data-delay="2"] .clip-inner { transition-delay: 0.24s; }
+    [data-clip][data-delay="3"] .clip-inner { transition-delay: 0.36s; }
+    [data-clip].is-visible .clip-inner {
+      clip-path: inset(0 0 0% 0);
+      transform: translateY(0);
+    }
+
+    /* ── WORD STAGGER [data-stagger] ── */
+    [data-stagger] .s-word {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: bottom;
+      margin-right: 0.2em;
+    }
+    [data-stagger] .s-word .s-inner {
+      display: inline-block;
+      clip-path: inset(0 0 100% 0);
+      transform: translateY(6px);
+      transition:
+        clip-path 0.6s var(--ease-warp),
+        transform 0.6s var(--ease-warp);
+    }
+    [data-stagger].is-visible .s-word .s-inner {
+      clip-path: inset(0 0 0% 0);
+      transform: translateY(0);
+    }
 
     [data-delay="1"] { transition-delay: 0.1s; }
     [data-delay="2"] { transition-delay: 0.2s; }
@@ -477,12 +533,16 @@
 
     .hero h1 {
       font-family: var(--font-heading-ja);
-      font-size: clamp(2.5rem, 7vw, 5rem);
+      font-size: clamp(1.875rem, 7vw, 5rem);
       font-weight: 400;
       color: var(--color-cream);
       letter-spacing: 0.1em;
       line-height: 1.3;
       margin-bottom: 1rem;
+    }
+    .hero__h1-line {
+      display: block;
+      white-space: nowrap;
     }
 
     .hero__sub {
@@ -1121,6 +1181,180 @@
 
       body { padding-bottom: 64px; }
     }
+
+    /* ════════════════════════════════
+       LOADER
+    ════════════════════════════════ */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: var(--color-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+    }
+    #loader.is-done {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.8s var(--ease-warp), visibility 0s 0.9s;
+    }
+    .loader__title {
+      font-family: var(--font-display);
+      font-size: clamp(5rem, 18vw, 11rem);
+      letter-spacing: 0.25em;
+      line-height: 1;
+      overflow: hidden;
+    }
+    .loader__title span {
+      display: block;
+      animation: loaderSlideUp 0.9s var(--ease-warp) 0.2s both;
+    }
+    @keyframes loaderSlideUp {
+      from { clip-path: inset(0 0 100% 0); transform: translateY(24px); }
+      to   { clip-path: inset(0 0 0% 0);   transform: translateY(0); }
+    }
+    .loader__bar {
+      width: 160px;
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+      position: relative;
+      overflow: hidden;
+    }
+    .loader__bar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, var(--color-neon), var(--color-neon-alt));
+      transform: scaleX(0);
+      transform-origin: left;
+      animation: loaderFill 1.8s var(--ease-warp) 0.4s forwards;
+      box-shadow: 0 0 8px var(--color-neon);
+    }
+    @keyframes loaderFill { to { transform: scaleX(1); } }
+    .loader__sub {
+      font-family: var(--font-ui);
+      font-size: 0.5625rem;
+      letter-spacing: 0.5em;
+      color: var(--color-text-subtle);
+      text-transform: uppercase;
+      animation: loaderFadeIn 0.4s ease 0.5s both;
+    }
+    @keyframes loaderFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* ════════════════════════════════
+       CUSTOM CURSOR (desktop only)
+    ════════════════════════════════ */
+    @media (pointer: fine) {
+      html, a, button { cursor: none; }
+      #cursor {
+        position: fixed;
+        top: 0; left: 0;
+        pointer-events: none;
+        z-index: 9998;
+      }
+      .cursor__ring {
+        position: absolute;
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(124,58,237,0.65);
+        transform: translate(-50%, -50%);
+        transition:
+          width  0.35s var(--ease-snap),
+          height 0.35s var(--ease-snap),
+          border-color 0.3s ease,
+          box-shadow 0.3s ease;
+        box-shadow: 0 0 8px rgba(124,58,237,0.15);
+      }
+      .cursor__dot {
+        position: absolute;
+        width: 5px; height: 5px;
+        background: var(--color-neon);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 6px var(--color-neon), 0 0 16px rgba(124,58,237,0.5);
+        transition: background 0.2s ease, width 0.2s ease, height 0.2s ease;
+      }
+      #cursor.is-hovering .cursor__ring {
+        width: 58px; height: 58px;
+        border-color: var(--color-neon-alt);
+        box-shadow: 0 0 16px rgba(6,182,212,0.2);
+      }
+      #cursor.is-hovering .cursor__dot {
+        background: var(--color-neon-alt);
+        box-shadow: 0 0 8px var(--color-neon-alt);
+      }
+      #cursor.is-clicking .cursor__ring {
+        width: 18px; height: 18px;
+        border-color: var(--color-amber);
+      }
+      #cursor.is-clicking .cursor__dot {
+        background: var(--color-amber);
+        width: 8px; height: 8px;
+        box-shadow: 0 0 8px var(--color-amber);
+      }
+      #cursor.is-hidden { opacity: 0; }
+    }
+
+    /* ════════════════════════════════
+       SCENE HORIZONTAL SCROLL
+    ════════════════════════════════ */
+    .scene__track-wrap {
+      margin-top: clamp(2.5rem, 5vw, 4rem);
+    }
+    .scene__track {
+      display: flex;
+      gap: clamp(0.875rem, 2vw, 1.25rem);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 0 clamp(1.25rem, 5vw, 2.5rem) 1.5rem;
+      cursor: grab;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(124,58,237,0.3) transparent;
+      overscroll-behavior-x: contain;
+    }
+    .scene__track.is-dragging { cursor: grabbing; user-select: none; }
+    .scene__track::-webkit-scrollbar { height: 2px; }
+    .scene__track::-webkit-scrollbar-track { background: transparent; }
+    .scene__track::-webkit-scrollbar-thumb {
+      background: rgba(124,58,237,0.35); border-radius: 2px;
+    }
+    .card-scene {
+      flex: 0 0 min(340px, 78vw);
+      scroll-snap-align: start;
+      min-height: unset;
+      aspect-ratio: 2 / 3;
+    }
+    .scene__drag-hint {
+      text-align: center;
+      padding: 0.875rem clamp(1.25rem, 5vw, 2.5rem) 0;
+      animation: hintPulse 2.2s ease-in-out infinite;
+    }
+    @keyframes hintPulse {
+      0%, 100% { opacity: 0.35; }
+      50%       { opacity: 0.8; }
+    }
+    .scene__drag-hint span {
+      font-family: var(--font-ui);
+      font-size: 0.5rem;
+      letter-spacing: 0.5em;
+      color: var(--color-text-subtle);
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.875rem;
+    }
+    .scene__drag-hint span::before,
+    .scene__drag-hint span::after {
+      content: '';
+      display: inline-block;
+      width: 18px; height: 1px;
+      background: currentColor;
+    }
   </style>
 
   <!-- schema.org 構造化データ -->
@@ -1144,6 +1378,21 @@
 </head>
 
 <body>
+
+  <!-- ローディング画面 -->
+  <div id="loader" aria-hidden="true">
+    <div class="loader__title glitch-text" data-text="WARP">
+      <span>WARP</span>
+    </div>
+    <div class="loader__bar"></div>
+    <p class="loader__sub">Loading</p>
+  </div>
+
+  <!-- カスタムカーソル -->
+  <div id="cursor" aria-hidden="true">
+    <div class="cursor__ring"></div>
+    <div class="cursor__dot"></div>
+  </div>
 
   <header class="site-header" id="site-header">
     <a href="#hero" class="header-logo warp-logo">BAR WARP</a>
@@ -1187,11 +1436,14 @@
     <div class="hero__neon-leak" aria-hidden="true"></div>
 
     <div class="hero__content">
-      <p class="hero__eyebrow" data-warp="left" data-delay="1">BAR WARP — TOKUSHIMA</p>
+      <p class="hero__eyebrow" data-stagger>BAR WARP — TOKUSHIMA</p>
 
-      <h1 data-warp data-delay="2">階段を上がれば、歪んだ夜。</h1>
+      <h1>
+        <span data-clip class="hero__h1-line"><span class="clip-inner">階段を上がれば、</span></span>
+        <span data-clip data-delay="1" class="hero__h1-line"><span class="clip-inner glitch-text" data-text="歪んだ夜。">歪んだ夜。</span></span>
+      </h1>
 
-      <p class="hero__sub" data-warp data-delay="3">徳島・栄町の2軒目を、非日常に。</p>
+      <p class="hero__sub" data-stagger>徳島・栄町の2軒目を、非日常に。</p>
 
       <p class="hero__desc" data-fade data-delay="3">
         栄町メイン通りの角地、2階。カウンターとボックスの小箱バーで、<br>街のテンポから一歩ずれた時間が流れる。
@@ -1285,15 +1537,18 @@
         <span class="ja">あなたの夜に、合わせる場所。</span>
       </div>
 
-      <div class="scene__grid">
+    </div><!-- /.container -->
+
+    <div class="scene__track-wrap">
+      <div class="scene__track" id="scene-track">
 
         <!-- カード1: 2軒目 -->
-        <article class="card-scene" data-fade data-delay="1">
+        <article class="card-scene">
           <img
             class="card-scene__bg"
-            src="https://images.pexels.com/photos/4762719/pexels-photo-4762719.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop"
+            src="https://images.pexels.com/photos/4762719/pexels-photo-4762719.jpeg?auto=compress&cs=tinysrgb&w=800&h=1200&fit=crop"
             alt="カクテル — 2軒目シーン"
-            loading="lazy" width="800" height="600"
+            loading="lazy" width="800" height="1200"
           >
           <div class="card-scene__overlay"></div>
           <div class="card-scene__content">
@@ -1306,12 +1561,12 @@
         </article>
 
         <!-- カード2: アフター -->
-        <article class="card-scene" data-fade data-delay="2">
+        <article class="card-scene">
           <img
             class="card-scene__bg"
-            src="https://images.pexels.com/photos/2411688/pexels-photo-2411688.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop"
+            src="https://images.pexels.com/photos/2411688/pexels-photo-2411688.jpeg?auto=compress&cs=tinysrgb&w=800&h=1200&fit=crop"
             alt="都市の夜景 — アフターシーン"
-            loading="lazy" width="800" height="600"
+            loading="lazy" width="800" height="1200"
           >
           <div class="card-scene__overlay"></div>
           <div class="card-scene__content">
@@ -1324,12 +1579,12 @@
         </article>
 
         <!-- カード3: ひとり飲み -->
-        <article class="card-scene" data-fade data-delay="3">
+        <article class="card-scene">
           <img
             class="card-scene__bg"
-            src="https://images.pexels.com/photos/17010905/pexels-photo-17010905.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop"
+            src="https://images.pexels.com/photos/17010905/pexels-photo-17010905.jpeg?auto=compress&cs=tinysrgb&w=800&h=1200&fit=crop"
             alt="バーカウンターのグラス — ひとり飲みシーン"
-            loading="lazy" width="800" height="600"
+            loading="lazy" width="800" height="1200"
           >
           <div class="card-scene__overlay"></div>
           <div class="card-scene__content">
@@ -1342,12 +1597,12 @@
         </article>
 
         <!-- カード4: カラオケ -->
-        <article class="card-scene" data-fade data-delay="4">
+        <article class="card-scene">
           <img
             class="card-scene__bg"
-            src="https://images.pexels.com/photos/6324813/pexels-photo-6324813.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop"
+            src="https://images.pexels.com/photos/6324813/pexels-photo-6324813.jpeg?auto=compress&cs=tinysrgb&w=800&h=1200&fit=crop"
             alt="マイクスタンド — カラオケシーン"
-            loading="lazy" width="800" height="600"
+            loading="lazy" width="800" height="1200"
           >
           <div class="card-scene__overlay"></div>
           <div class="card-scene__content">
@@ -1359,8 +1614,9 @@
           </div>
         </article>
 
-      </div>
-    </div>
+      </div><!-- /.scene__track -->
+      <div class="scene__drag-hint" aria-hidden="true"><span>DRAG TO EXPLORE</span></div>
+    </div><!-- /.scene__track-wrap -->
   </section>
 
   <section class="space" id="space">
@@ -1526,34 +1782,151 @@
     (function () {
       'use strict';
 
-      const warpObserver = new IntersectionObserver(function (entries) {
+      /* ─────────────────────────────────
+         1. LOADER
+      ───────────────────────────────── */
+      var loader = document.getElementById('loader');
+      function dismissLoader() {
+        if (loader) {
+          loader.classList.add('is-done');
+          // ローダー非表示後にアニメーション開始
+          setTimeout(function () {
+            document.body.classList.add('loaded');
+            triggerHeroAnimations();
+          }, 100);
+        }
+      }
+      // 最低2秒表示 → ページロード後に非表示
+      var loaderMin = new Promise(function (res) { setTimeout(res, 2200); });
+      var pageLoad  = new Promise(function (res) {
+        if (document.readyState === 'complete') { res(); }
+        else { window.addEventListener('load', res); }
+      });
+      Promise.all([loaderMin, pageLoad]).then(dismissLoader);
+
+      /* ─────────────────────────────────
+         2. HERO clip-path + stagger の即時起動
+      ───────────────────────────────── */
+      function triggerHeroAnimations() {
+        // [data-clip] in hero
+        document.querySelectorAll('.hero [data-clip]').forEach(function (el) {
+          el.classList.add('is-visible');
+        });
+        // [data-stagger] in hero
+        document.querySelectorAll('.hero [data-stagger]').forEach(function (el, idx) {
+          setTimeout(function () {
+            el.classList.add('is-visible');
+          }, 200 + idx * 150);
+        });
+        // hero [data-fade]
+        document.querySelectorAll('.hero [data-fade]').forEach(function (el) {
+          setTimeout(function () { el.classList.add('is-visible'); }, 400);
+        });
+      }
+
+      /* ─────────────────────────────────
+         3. WORD STAGGER — [data-stagger]を自動で単語分割
+      ───────────────────────────────── */
+      document.querySelectorAll('[data-stagger]').forEach(function (el) {
+        var text = el.textContent.trim();
+        var words = text.split(/(\s+)/);
+        var html = '';
+        var wordIndex = 0;
+        words.forEach(function (token) {
+          if (token.trim() === '') {
+            html += '<span style="display:inline-block;width:0.3em"></span>';
+          } else {
+            var delay = (wordIndex * 0.07).toFixed(2);
+            html += '<span class="s-word" style="transition-delay:' + delay + 's">'
+                  + '<span class="s-inner">' + token + '</span>'
+                  + '</span>';
+            wordIndex++;
+          }
+        });
+        el.innerHTML = html;
+      });
+
+      /* ─────────────────────────────────
+         4. INTERSECTION OBSERVER — scroll reveal
+      ───────────────────────────────── */
+      var revealObserver = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
           if (entry.isIntersecting) {
             entry.target.classList.add('is-visible');
-            warpObserver.unobserve(entry.target);
+            revealObserver.unobserve(entry.target);
           }
         });
-      }, {
-        threshold: 0.15,
-        rootMargin: '0px 0px -40px 0px'
-      });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
-      document.querySelectorAll('[data-warp], [data-fade]').forEach(function (el) {
-        warpObserver.observe(el);
-      });
-
-      var header = document.getElementById('site-header');
-
-      function updateHeader() {
-        if (window.scrollY > 60) {
-          header.classList.add('scrolled');
-        } else {
-          header.classList.remove('scrolled');
+      // hero内の要素はloaderで制御するためスキップ
+      document.querySelectorAll('[data-warp], [data-fade], [data-clip], [data-stagger]').forEach(function (el) {
+        if (!el.closest('.hero')) {
+          revealObserver.observe(el);
         }
+      });
+
+      /* ─────────────────────────────────
+         5. CUSTOM CURSOR
+      ───────────────────────────────── */
+      var cursor = document.getElementById('cursor');
+      if (cursor && window.matchMedia('(pointer: fine)').matches) {
+        var cursorRing = cursor.querySelector('.cursor__ring');
+        var cursorDot  = cursor.querySelector('.cursor__dot');
+        var mx = -100, my = -100;
+        var rx = -100, ry = -100;
+        var raf;
+
+        document.addEventListener('mousemove', function (e) {
+          mx = e.clientX;
+          my = e.clientY;
+          // dot follows instantly
+          cursorDot.style.left  = mx + 'px';
+          cursorDot.style.top   = my + 'px';
+          cursor.classList.remove('is-hidden');
+        });
+
+        // ring follows with lag
+        function animRing() {
+          rx += (mx - rx) * 0.12;
+          ry += (my - ry) * 0.12;
+          cursorRing.style.left = rx + 'px';
+          cursorRing.style.top  = ry + 'px';
+          raf = requestAnimationFrame(animRing);
+        }
+        animRing();
+
+        document.addEventListener('mouseleave', function () {
+          cursor.classList.add('is-hidden');
+        });
+        document.addEventListener('mouseenter', function () {
+          cursor.classList.remove('is-hidden');
+        });
+
+        // hover state on interactive elements
+        document.querySelectorAll('a, button').forEach(function (el) {
+          el.addEventListener('mouseenter', function () { cursor.classList.add('is-hovering'); });
+          el.addEventListener('mouseleave', function () { cursor.classList.remove('is-hovering'); });
+        });
+
+        // click state
+        document.addEventListener('mousedown', function () { cursor.classList.add('is-clicking'); });
+        document.addEventListener('mouseup',   function () { cursor.classList.remove('is-clicking'); });
+      }
+
+      /* ─────────────────────────────────
+         6. HEADER SCROLL
+      ───────────────────────────────── */
+      var header = document.getElementById('site-header');
+      function updateHeader() {
+        if (window.scrollY > 60) { header.classList.add('scrolled'); }
+        else { header.classList.remove('scrolled'); }
       }
       window.addEventListener('scroll', updateHeader, { passive: true });
       updateHeader();
 
+      /* ─────────────────────────────────
+         7. HAMBURGER MENU
+      ───────────────────────────────── */
       var hamburgerBtn = document.getElementById('hamburger-btn');
       var mobileMenu   = document.getElementById('mobile-menu');
 
@@ -1563,26 +1936,25 @@
         hamburgerBtn.setAttribute('aria-expanded', 'true');
         document.body.style.overflow = 'hidden';
       }
-
       function closeMenu() {
         hamburgerBtn.classList.remove('is-open');
         mobileMenu.classList.remove('is-open');
         hamburgerBtn.setAttribute('aria-expanded', 'false');
         document.body.style.overflow = '';
       }
-
       hamburgerBtn.addEventListener('click', function () {
         mobileMenu.classList.contains('is-open') ? closeMenu() : openMenu();
       });
-
       mobileMenu.querySelectorAll('a').forEach(function (link) {
         link.addEventListener('click', closeMenu);
       });
-
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeMenu();
       });
 
+      /* ─────────────────────────────────
+         8. SMOOTH SCROLL
+      ───────────────────────────────── */
       document.querySelectorAll('a[href^="#"]').forEach(function (link) {
         link.addEventListener('click', function (e) {
           var targetId = link.getAttribute('href');
@@ -1600,8 +1972,44 @@
         });
       });
 
-      var mobileSticky = document.getElementById('mobile-sticky');
+      /* ─────────────────────────────────
+         9. SCENE — DRAG SCROLL
+      ───────────────────────────────── */
+      var track = document.getElementById('scene-track');
+      if (track) {
+        var isDragging = false, startX, scrollLeft;
+        track.addEventListener('mousedown', function (e) {
+          isDragging = true;
+          track.classList.add('is-dragging');
+          startX = e.pageX - track.offsetLeft;
+          scrollLeft = track.scrollLeft;
+        });
+        document.addEventListener('mousemove', function (e) {
+          if (!isDragging) return;
+          e.preventDefault();
+          var x = e.pageX - track.offsetLeft;
+          track.scrollLeft = scrollLeft - (x - startX) * 1.2;
+        });
+        document.addEventListener('mouseup', function () {
+          isDragging = false;
+          track.classList.remove('is-dragging');
+        });
+        // touch drag (モバイル)
+        var touchStartX, touchScrollLeft;
+        track.addEventListener('touchstart', function (e) {
+          touchStartX = e.touches[0].pageX;
+          touchScrollLeft = track.scrollLeft;
+        }, { passive: true });
+        track.addEventListener('touchmove', function (e) {
+          var diff = touchStartX - e.touches[0].pageX;
+          track.scrollLeft = touchScrollLeft + diff;
+        }, { passive: true });
+      }
 
+      /* ─────────────────────────────────
+         10. MOBILE STICKY FOOTER
+      ───────────────────────────────── */
+      var mobileSticky = document.getElementById('mobile-sticky');
       function updateStickyFooter() {
         if (!mobileSticky) return;
         if (window.scrollY > 50) {
